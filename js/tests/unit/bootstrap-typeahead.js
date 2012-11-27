@@ -123,6 +123,38 @@ $(function () {
         typeahead.$menu.remove()
       })
 
+      test("should not show menu if process is called after blur or ESC keyup unless lookup is triggered again", function () {
+        var $input = $('<input />').typeahead({
+              source: function(){}
+            })
+          , typeahead = $input.data('typeahead')
+
+        $input.val('a')
+        typeahead.lookup()
+        $input.blur()
+        typeahead.process(['aa', 'ab', 'ac'])
+
+        ok(!typeahead.$menu.is(":visible"), "typeahead is no longer visible")
+
+        $input.val('a')
+        typeahead.lookup()
+        $input.trigger({
+          type: 'keyup'
+        , keyCode: 27
+        })
+        typeahead.process(['aa', 'ab', 'ac'])
+
+        ok(!typeahead.$menu.is(":visible"), "typeahead is no longer visible")
+
+        $input.val('ab')
+        typeahead.lookup()
+        typeahead.process(['aa', 'ab', 'ac'])
+
+        ok(typeahead.$menu.is(":visible"), "typeahead is visible")
+
+        typeahead.$menu.remove()
+      })
+
       test("should set next item when down arrow is pressed", function () {
         var $input = $('<input />').typeahead({
               source: ['aa', 'ab', 'ac']
