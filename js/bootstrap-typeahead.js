@@ -36,6 +36,7 @@
     this.$menu = $(this.options.menu).appendTo('body')
     this.source = this.options.source
     this.shown = false
+    this.cancelled = false
     this.listen()
   }
 
@@ -56,6 +57,8 @@
     }
 
   , show: function () {
+      if (this.cancelled) return
+
       var pos = $.extend({}, this.$element.offset(), {
         height: this.$element[0].offsetHeight
       })
@@ -76,8 +79,15 @@
       return this
     }
 
+  , cancel: function () {
+      this.cancelled = true
+      this.hide()
+    }
+
   , lookup: function (event) {
       var items
+
+      this.cancelled = false
 
       this.query = this.$element.val()
 
@@ -242,8 +252,7 @@
           break
 
         case 27: // escape
-          if (!this.shown) return
-          this.hide()
+          this.cancel()
           break
 
         default:
@@ -255,8 +264,7 @@
   }
 
   , blur: function (e) {
-      var that = this
-      setTimeout(function () { that.hide() }, 150)
+      this.cancel()
     }
 
   , click: function (e) {
